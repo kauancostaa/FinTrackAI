@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +24,7 @@ export default function DashboardPage() {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      console.log("🔄 Fetching dashboard data...");
+      console.log("Fetching dashboard data...");
       
       // Usando o novo serviço que sempre funciona
       const [statsData, transactionsData, alertsData] = await Promise.all([
@@ -33,7 +33,7 @@ export default function DashboardPage() {
         bankingApi.getFraudAlerts()
       ]);
 
-      console.log("✅ Data loaded successfully:", { 
+      console.log("Data loaded successfully:", { 
         stats: !!statsData, 
         transactions: transactionsData?.data?.length || 0,
         alerts: alertsData?.length || 0 
@@ -46,7 +46,7 @@ export default function DashboardPage() {
       
       toast.success("Dashboard atualizado com sucesso!");
     } catch (error) {
-      console.error("❌ Error in fetchDashboardData:", error);
+      console.error("Error in fetchDashboardData:", error);
       toast.error("Erro ao carregar dados. Usando dados de demonstração.");
       
       // Fallback hardcoded
