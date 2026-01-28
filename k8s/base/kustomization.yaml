@@ -1,0 +1,16 @@
+﻿apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: fintech
+
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - sqlserver.yaml
+  - account-service.yaml
+  - frontend.yaml
+
+commonLabels:
+  app: fintech
+  managed-by: kustomize

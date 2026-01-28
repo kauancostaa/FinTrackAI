@@ -1,0 +1,24 @@
+﻿apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: fintech
+
+resources:
+  - ../../base
+
+patchesStrategicMerge:
+  - patch.yaml
+
+images:
+  - name: account-service
+    newTag: latest
+  - name: frontend
+    newTag: alpine
+
+replicas:
+  - name: account-service
+    count: 1
+  - name: frontend
+    count: 1
+  - name: sqlserver
+    count: 1

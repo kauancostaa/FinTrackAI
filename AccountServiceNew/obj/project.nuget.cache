@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "dBVkULW4Lb4=",
+  "success": true,
+  "projectFilePath": "D:\\Projects\\FinTrackAI\\AccountServiceNew\\AccountService.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Kauan Costa\\.nuget\\packages\\rabbitmq.client\\6.8.1\\rabbitmq.client.6.8.1.nupkg.sha512"
+  ],
+  "logs": []
+}

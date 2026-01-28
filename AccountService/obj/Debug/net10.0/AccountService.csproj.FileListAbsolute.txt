@@ -1,0 +1,8 @@
+D:\Projects\FinTrackAI\AccountService\obj\Debug\net10.0\AccountService.csproj.AssemblyReference.cache
+D:\Projects\FinTrackAI\AccountService\obj\Debug\net10.0\rpswa.dswa.cache.json
+D:\Projects\FinTrackAI\AccountService\obj\Debug\net10.0\AccountService.GeneratedMSBuildEditorConfig.editorconfig
+D:\Projects\FinTrackAI\AccountService\obj\Debug\net10.0\AccountService.AssemblyInfoInputs.cache
+D:\Projects\FinTrackAI\AccountService\obj\Debug\net10.0\AccountService.AssemblyInfo.cs
+D:\Projects\FinTrackAI\AccountService\obj\Debug\net10.0\AccountService.csproj.CoreCompileInputs.cache
+D:\Projects\FinTrackAI\AccountService\obj\Debug\net10.0\AccountService.MvcApplicationPartsAssemblyInfo.cs
+D:\Projects\FinTrackAI\AccountService\obj\Debug\net10.0\AccountService.MvcApplicationPartsAssemblyInfo.cache

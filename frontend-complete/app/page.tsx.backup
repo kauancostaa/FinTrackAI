@@ -1,0 +1,550 @@
+﻿"use client";
+
+import { useState, useEffect } from "react";
+import { 
+  BarChart3, CreditCard, Shield, TrendingUp, 
+  Users, DollarSign, AlertTriangle, Activity,
+  Download, Filter, Plus, MoreVertical,
+  ArrowUpRight, ArrowDownRight
+} from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Progress } from "@/components/ui/progress";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
+import bankingApi, { type DashboardStats, type Transaction, type FraudAlert } from "@/services/banking-api.service";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from "recharts";
+
+// Mock data for charts
+const transactionData = [
+  { date: "Jan", amount: 4000 },
+  { date: "Feb", amount: 3000 },
+  { date: "Mar", amount: 5000 },
+  { date: "Apr", amount: 2780 },
+  { date: "May", amount: 1890 },
+  { date: "Jun", amount: 2390 },
+];
+
+const fraudData = [
+  { name: "Low", value: 40, color: "#10b981" },
+  { name: "Medium", value: 30, color: "#f59e0b" },
+  { name: "High", value: 20, color: "#ef4444" },
+  { name: "Critical", value: 10, color: "#7c3aed" },
+];
+
+const recentTransactions: Transaction[] = [
+  {
+    id: "1",
+    amount: 1250.75,
+    type: "CREDIT",
+    status: "COMPLETED",
+    timestamp: "2024-01-26T10:30:00Z",
+    accountId: "ACC001",
+    merchant: "Tech Corp Inc",
+    location: "San Francisco, CA",
+    description: "Software purchase",
+    category: "Technology",
+    riskScore: 12,
+    isFraud: false,
+  },
+  {
+    id: "2",
+    amount: 89.99,
+    type: "DEBIT",
+    status: "COMPLETED",
+    timestamp: "2024-01-26T09:15:00Z",
+    accountId: "ACC001",
+    merchant: "Coffee Brew",
+    location: "New York, NY",
+    description: "Coffee purchase",
+    category: "Food & Drink",
+    riskScore: 85,
+    isFraud: true,
+  },
+  {
+    id: "3",
+    amount: 2500.00,
+    type: "TRANSFER",
+    status: "PENDING",
+    timestamp: "2024-01-26T08:45:00Z",
+    accountId: "ACC002",
+    merchant: "John Doe",
+    location: "Miami, FL",
+    description: "Family transfer",
+    category: "Transfer",
+    riskScore: 25,
+    isFraud: false,
+  },
+];
+
+const fraudAlerts: FraudAlert[] = [
+  {
+    id: "1",
+    transactionId: "TXN001",
+    severity: "HIGH",
+    type: "Unusual Location",
+    description: "Transaction from unusual location",
+    status: "OPEN",
+    timestamp: "2024-01-26T09:15:00Z",
+  },
+  {
+    id: "2",
+    transactionId: "TXN002",
+    severity: "MEDIUM",
+    type: "Large Amount",
+    description: "Unusually large transaction amount",
+    status: "INVESTIGATING",
+    timestamp: "2024-01-26T08:30:00Z",
+  },
+];
+
+export default function DashboardPage() {
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState("month");
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
+
+  const fetchDashboardData = async () => {
+    try {
+      setLoading(true);
+      // TODO: Replace with actual API call
+      // const stats = await bankingApi.analytics.getDashboardStats();
+      // setDashboardStats(stats);
+      
+      // Mock data for now
+      setTimeout(() => {
+        setDashboardStats({
+          totalBalance: 2450890.45,
+          totalTransactions: 12458,
+          fraudDetected: 23,
+          riskScore: 72,
+          monthlyGrowth: 12.5,
+          activeAccounts: 42,
+          pendingTransactions: 156,
+          systemUptime: 99.99,
+        });
+        setLoading(false);
+      }, 1000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load dashboard data",
+        variant: "destructive",
+      });
+      setLoading(false);
+    }
+  };
+
+  const handleExport = () => {
+    toast({
+      title: "Export initiated",
+      description: "Your report is being prepared...",
+    });
+  };
+
+  const handleRefresh = () => {
+    fetchDashboardData();
+    toast({
+      title: "Refreshing",
+      description: "Dashboard data is being updated...",
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-900 dark:to-gray-950">
+      {/* Header */}
+      <header className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg">
+        <div className="px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Banking Dashboard</h1>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Real-time monitoring and analysis of financial operations
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Select value={timeRange} onValueChange={setTimeRange}>
+                <SelectTrigger className="w-[120px]">
+                  <SelectValue placeholder="Time Range" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="day">Today</SelectItem>
+                  <SelectItem value="week">This Week</SelectItem>
+                  <SelectItem value="month">This Month</SelectItem>
+                  <SelectItem value="year">This Year</SelectItem>
+                </SelectContent>
+              </Select>
+              <Button variant="outline" onClick={handleRefresh}>
+                <Activity className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+              <Button onClick={handleExport}>
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="p-6">
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <Card className="border-l-4 border-l-blue-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Balance</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-8 w-32" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">${dashboardStats?.totalBalance.toLocaleString()}</div>
+                  <div className="flex items-center text-xs text-green-600">
+                    <ArrowUpRight className="h-3 w-3 mr-1" />
+                    {dashboardStats?.monthlyGrowth}% from last month
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-green-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Transactions</CardTitle>
+              <CreditCard className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-8 w-32" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{dashboardStats?.totalTransactions.toLocaleString()}</div>
+                  <div className="flex items-center text-xs text-green-600">
+                    <ArrowUpRight className="h-3 w-3 mr-1" />
+                    +8.2% from yesterday
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-red-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Fraud Detected</CardTitle>
+              <Shield className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-8 w-32" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{dashboardStats?.fraudDetected}</div>
+                  <div className="flex items-center text-xs text-green-600">
+                    <ArrowDownRight className="h-3 w-3 mr-1" />
+                    -3 from last week
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-l-4 border-l-yellow-500">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Risk Score</CardTitle>
+              <AlertTriangle className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <Skeleton className="h-8 w-32" />
+              ) : (
+                <>
+                  <div className="text-2xl font-bold">{dashboardStats?.riskScore}/100</div>
+                  <div className="flex items-center text-xs">
+                    <Badge variant={dashboardStats && dashboardStats.riskScore < 50 ? "success" : "warning"}>
+                      {dashboardStats && dashboardStats.riskScore < 50 ? "Low Risk" : "Medium Risk"}
+                    </Badge>
+                  </div>
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Main Dashboard */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Charts */}
+          <div className="lg:col-span-2 space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Transaction Volume</CardTitle>
+                <CardDescription>Last 6 months transaction trend</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[300px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={transactionData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="date" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="amount" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Transactions</CardTitle>
+                <CardDescription>Latest banking transactions</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Merchant</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Type</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Risk</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recentTransactions.map((transaction) => (
+                      <TableRow key={transaction.id}>
+                        <TableCell className="font-medium">
+                          <div>
+                            <div>{transaction.merchant}</div>
+                            <div className="text-xs text-muted-foreground">{transaction.description}</div>
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className={`font-semibold ${
+                            transaction.type === "CREDIT" ? "text-green-600" : "text-red-600"
+                          }`}>
+                            {transaction.type === "CREDIT" ? "+" : "-"}${transaction.amount.toFixed(2)}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{transaction.type}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge
+                            variant={
+                              transaction.status === "COMPLETED"
+                                ? "success"
+                                : transaction.status === "PENDING"
+                                ? "warning"
+                                : "destructive"
+                            }
+                          >
+                            {transaction.status}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex items-center gap-2">
+                            <Progress value={transaction.riskScore} className="w-20" />
+                            <span className="text-sm">{transaction.riskScore}</span>
+                            {transaction.isFraud && (
+                              <Badge variant="destructive" className="text-xs">FRAUD</Badge>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Column - Alerts & Analytics */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Fraud Alerts</CardTitle>
+                <CardDescription>Active fraud detection alerts</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {fraudAlerts.map((alert) => (
+                    <div
+                      key={alert.id}
+                      className="p-4 border rounded-lg bg-gradient-to-r from-red-50 to-orange-50 dark:from-red-950/20 dark:to-orange-950/20"
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <div>
+                          <Badge
+                            variant={
+                              alert.severity === "CRITICAL"
+                                ? "destructive"
+                                : alert.severity === "HIGH"
+                                ? "destructive"
+                                : "warning"
+                            }
+                          >
+                            {alert.severity}
+                          </Badge>
+                          <div className="font-medium mt-2">{alert.type}</div>
+                          <div className="text-sm text-muted-foreground">{alert.description}</div>
+                        </div>
+                        <Button variant="ghost" size="icon">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="flex justify-between text-xs text-muted-foreground mt-2">
+                        <span>{new Date(alert.timestamp).toLocaleTimeString()}</span>
+                        <Badge variant="outline">{alert.status}</Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Fraud Distribution</CardTitle>
+                <CardDescription>Breakdown by severity level</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={fraudData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {fraudData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Quick Actions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-3">
+                  <Button className="h-auto py-3 flex-col gap-2">
+                    <Plus className="h-5 w-5" />
+                    <span className="text-xs">New Transaction</span>
+                  </Button>
+                  <Button variant="outline" className="h-auto py-3 flex-col gap-2">
+                    <Filter className="h-5 w-5" />
+                    <span className="text-xs">Filter Results</span>
+                  </Button>
+                  <Button variant="outline" className="h-auto py-3 flex-col gap-2">
+                    <Users className="h-5 w-5" />
+                    <span className="text-xs">Manage Accounts</span>
+                  </Button>
+                  <Button variant="outline" className="h-auto py-3 flex-col gap-2">
+                    <BarChart3 className="h-5 w-5" />
+                    <span className="text-xs">View Reports</span>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* System Status */}
+            <Card>
+              <CardHeader>
+                <CardTitle>System Status</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm">API Response Time</span>
+                      <span className="text-sm font-medium">&lt; 50ms</span>
+                    </div>
+                    <Progress value={95} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm">Database Uptime</span>
+                      <span className="text-sm font-medium">99.99%</span>
+                    </div>
+                    <Progress value={99} />
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-sm">Backend Connection</span>
+                      <Badge variant="success" className="text-xs">Connected</Badge>
+                    </div>
+                    <Progress value={100} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* Footer Stats */}
+        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+            <div className="text-sm text-muted-foreground">Active Accounts</div>
+            <div className="text-2xl font-bold">{dashboardStats?.activeAccounts || 42}</div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+            <div className="text-sm text-muted-foreground">Pending Transactions</div>
+            <div className="text-2xl font-bold">{dashboardStats?.pendingTransactions || 156}</div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+            <div className="text-sm text-muted-foreground">System Uptime</div>
+            <div className="text-2xl font-bold">{dashboardStats?.systemUptime || 99.99}%</div>
+          </div>
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border">
+            <div className="text-sm text-muted-foreground">Data Processed Today</div>
+            <div className="text-2xl font-bold">1.2TB</div>
+          </div>
+        </div>
+      </main>
+
+      {/* Bottom Bar */}
+      <footer className="border-t bg-white/80 dark:bg-gray-900/80 backdrop-blur-lg mt-8">
+        <div className="px-6 py-3">
+          <div className="flex items-center justify-between text-sm text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse"></div>
+                <span>All systems operational</span>
+              </div>
+              <span>•</span>
+              <span>Last updated: Just now</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <span>v3.2.1</span>
+              <span>•</span>
+              <span>© 2024 FinTrackAI</span>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}

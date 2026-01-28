@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "YkUwmPTxl0M=",
+  "success": true,
+  "projectFilePath": "D:\\Projects\\FinTrackAI\\src\\Services\\IdentityService\\IdentityService.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Kauan Costa\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.2\\microsoft.aspnetcore.openapi.10.0.2.nupkg.sha512",
+    "C:\\Users\\Kauan Costa\\.nuget\\packages\\microsoft.openapi\\2.0.0\\microsoft.openapi.2.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,9 @@
+﻿apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: fintech-config
+  namespace: fintech
+data:
+  NODE_ENV: "development"
+  API_URL: "http://account-service:5198"
+  DATABASE_SERVER: "sqlserver"

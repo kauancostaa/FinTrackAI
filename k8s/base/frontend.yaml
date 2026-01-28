@@ -1,0 +1,89 @@
+﻿apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: fintech
+  labels:
+    app: frontend
+    tier: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: frontend-content
+          mountPath: /usr/share/nginx/html
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+      volumes:
+      - name: frontend-content
+        configMap:
+          name: frontend-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-config
+  namespace: fintech
+data:
+  index.html: |
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>FinTrackAI - Kubernetes</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 40px; }
+            .container { max-width: 800px; margin: 0 auto; }
+            .status { padding: 20px; border-radius: 5px; margin: 20px 0; }
+            .online { background: #d4edda; color: #155724; }
+            .offline { background: #f8d7da; color: #721c24; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🚀 FinTrackAI - Kubernetes</h1>
+            <p>Frontend temporário para testes Kubernetes</p>
+            
+            <div class="status online">
+                <h3>✅ Sistema em Kubernetes</h3>
+                <p>Namespace: fintech</p>
+                <p>AccountService: account-service:5198</p>
+            </div>
+            
+            <h2>Serviços:</h2>
+            <ul>
+                <li><a href="http://account-service:5198/health">AccountService Health</a></li>
+                <li><a href="http://account-service:5198/api/dashboard/stats">Dashboard Stats</a></li>
+            </ul>
+            
+            <h2>Port-forward:</h2>
+            <code>kubectl port-forward -n fintech svc/account-service 5198:5198</code>
+        </div>
+    </body>
+    </html>
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: fintech
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
