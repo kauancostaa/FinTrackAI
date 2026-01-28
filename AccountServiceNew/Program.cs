@@ -16,7 +16,7 @@ IModel? channel = null;
 
 try
 {
-    Console.WriteLine("📡 Configurando ConnectionFactory...");
+    Console.WriteLine("Configurando ConnectionFactory...");
     
     var factory = new ConnectionFactory()
     {
