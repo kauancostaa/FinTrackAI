@@ -1,17 +1,16 @@
-﻿using RabbitMQ.Client;
+using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
 
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
-Console.WriteLine("========================================");
-Console.WriteLine("🚀 FINTRACKAI BACKEND - CONEXÃO FINAL");
-Console.WriteLine("========================================");
 
-// ========================
+
+
+
+
 // CONEXÃO RABBITMQ
-// ========================
 IConnection? connection = null;
 IModel? channel = null;
 
@@ -33,28 +32,27 @@ try
     connection = factory.CreateConnection();
     channel = connection.CreateModel();
     
-    Console.WriteLine("✅ CONEXÃO ESTABELECIDA!");
+    Console.WriteLine("CONEXÃO ESTABELECIDA!");
     
     // Criar filas
     string[] queues = { "fintrackai.dashboard", "fintrackai.test" };
     foreach (var queue in queues)
     {
         channel.QueueDeclare(queue, durable: true, exclusive: false, autoDelete: false);
-        Console.WriteLine($"   🆗 Fila: {queue}");
+        Console.WriteLine($"   Fila: {queue}");
     }
     
-    Console.WriteLine("🎉 RABBITMQ CONFIGURADO COM SUCESSO!");
+    Console.WriteLine("RABBITMQ CONFIGURADO COM SUCESSO!");
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"❌ ERRO RABBITMQ: {ex.Message}");
-    Console.WriteLine("⚠️  Executando em modo degradado...");
+    Console.WriteLine($"ERRO RABBITMQ: {ex.Message}");
+    Console.WriteLine("Executando em modo degradado...");
 }
 
-// ========================
 // ENDPOINTS
-// ========================
-app.MapGet("/", () => "🚀 FinTrackAI Account Service");
+
+app.MapGet("/", () => "FinTrack Account Service");
 
 app.MapGet("/health", () =>
 {
@@ -99,7 +97,7 @@ app.MapGet("/api/rabbitmq/test", () =>
             return Results.Json(new
             {
                 success = true,
-                message = "✅ MENSAGEM PUBLICADA NO RABBITMQ!",
+                message = "MENSAGEM PUBLICADA NO RABBITMQ!",
                 publishedAt = DateTime.UtcNow,
                 queue = "fintrackai.test",
                 rabbitmq_ui = "http://localhost:15672/#/",
@@ -164,13 +162,13 @@ app.MapGet("/api/dashboard", () =>
 });
 
 Console.WriteLine("========================================");
-Console.WriteLine("✅ BACKEND PRONTO!");
-Console.WriteLine("🌐 Endpoints:");
+Console.WriteLine("BACKEND PRONTO!");
+Console.WriteLine("Endpoints:");
 Console.WriteLine("   http://localhost:5000/");
 Console.WriteLine("   http://localhost:5000/health");
 Console.WriteLine("   http://localhost:5000/api/rabbitmq/test");
 Console.WriteLine("   http://localhost:5000/api/dashboard");
-Console.WriteLine("🐇 RabbitMQ: http://localhost:15672/#/");
+Console.WriteLine("RabbitMQ: http://localhost:15672/#/");
 Console.WriteLine("========================================");
 
 app.Run();
